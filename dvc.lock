@@ -1,0 +1,95 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/data/data_ingestion.py
+    deps:
+    - path: src/data/data_ingestion.py
+      hash: md5
+      md5: 4437b69965606892a8f7d8b8ea02f145
+      size: 1371
+    params:
+      params.yaml:
+        data_ingestion.test_size: 0.2
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: ec02dbd12f39c779047dd3e43fb70a2b.dir
+      size: 827973
+      nfiles: 2
+  data_preprocessing:
+    cmd: python src/data/data_prepocessing.py
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: ec02dbd12f39c779047dd3e43fb70a2b.dir
+      size: 827973
+      nfiles: 2
+    - path: src/data/data_prepocessing.py
+      hash: md5
+      md5: ee38ff4ad1597378712d5e908bb0e041
+      size: 2601
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: eb7147f691171b463f43f36f566f49b5.dir
+      size: 622138
+      nfiles: 2
+  features:
+    cmd: python src/features/feature.py
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: eb7147f691171b463f43f36f566f49b5.dir
+      size: 622138
+      nfiles: 2
+    - path: src/features/feature.py
+      hash: md5
+      md5: 7fdae0d6a343386d2d57db08ebc511a7
+      size: 2003
+    params:
+      params.yaml:
+        feature.max_features: 80
+    outs:
+    - path: data/features
+      hash: md5
+      md5: 87998629d030126518a52ae72367a1a8.dir
+      size: 1741088
+      nfiles: 2
+  model_building:
+    cmd: python src/models/model_building.py
+    deps:
+    - path: data/features
+      hash: md5
+      md5: 87998629d030126518a52ae72367a1a8.dir
+      size: 1741088
+      nfiles: 2
+    - path: src/models/model_building.py
+      hash: md5
+      md5: 73dcfe022d90706d3c23e7fe10885dcc
+      size: 1847
+    params:
+      params.yaml:
+        model_building.learning_rate: 0.05
+        model_building.n_estimators: 50
+    outs:
+    - path: models/model.pkl
+      hash: md5
+      md5: 7c7e4f7fb912a5c273f714826cfdbc43
+      size: 70438
+  model_evluation:
+    cmd: python src/models/model_evluation.py
+    deps:
+    - path: data/features
+      hash: md5
+      md5: 87998629d030126518a52ae72367a1a8.dir
+      size: 1741088
+      nfiles: 2
+    - path: models/model.pkl
+      hash: md5
+      md5: 7c7e4f7fb912a5c273f714826cfdbc43
+      size: 70438
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: 91e9a88b5d6a7d078df14b7875ce849d
+      size: 146
